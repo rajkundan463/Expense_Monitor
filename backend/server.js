@@ -11,7 +11,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-  origin: "https://your-frontend.vercel.app",
+  origin: "https://expense-monitor-ycd2.vercel.app/",
   credentials: true
 }));
 
