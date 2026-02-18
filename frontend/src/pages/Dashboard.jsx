@@ -5,65 +5,43 @@ import ExpenseList from "../components/ExpenseList";
 import FilterBar from "../components/FilterBar";
 import TotalCard from "../components/TotalCard";
 import { AuthContext } from "../context/AuthContext";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-
-ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function Dashboard() {
   const { logout } = useContext(AuthContext);
+
   const [expenses, setExpenses] = useState([]);
-  const [summary, setSummary] = useState([]);
   const [category, setCategory] = useState("");
-  const [sort, setSort] = useState("date_desc");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const fetchExpenses = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get("/expenses", { params: { category, sort }});
-      setExpenses(res.data);
-    } catch {
-      setError("Failed to load expenses");
-    }
-    setLoading(false);
-  };
-
-  const fetchSummary = async () => {
-    const res = await axios.get("/expenses/summary");
-    setSummary(res.data);
+    const res = await axios.get("/expenses", {
+      params: { category, page, limit: 5 }
+    });
+    setExpenses(res.data.expenses);
+    setTotal(res.data.total);
   };
 
   useEffect(() => {
     fetchExpenses();
-    fetchSummary();
-  }, [category, sort]);
-
-  const chartData = {
-    labels: summary.map(s => s._id),
-    datasets: [{ data: summary.map(s => s.total / 100) }]
-  };
+  }, [category, page]);
 
   return (
     <div className="dashboard">
-      <div className="navbar">
-        <h2>Elite Expense Manager</h2>
-        <button className="danger-btn" onClick={logout}>Logout</button>
-      </div>
+      <header>
+        <h2>Elite Dashboard</h2>
+        <button onClick={logout}>Logout</button>
+      </header>
 
+      <TotalCard expenses={expenses} total={total} />
       <ExpenseForm refresh={fetchExpenses} />
-      <FilterBar category={category} setCategory={setCategory} sort={sort} setSort={setSort} />
-
-      {loading && <p>Loading...</p>}
-      {error && <p className="error">{error}</p>}
-
-      <TotalCard expenses={expenses} />
+      <FilterBar category={category} setCategory={setCategory} />
       <ExpenseList expenses={expenses} refresh={fetchExpenses} />
 
-      <div className="glass-card chart-card">
-        <h3>Category Breakdown</h3>
-        <Pie data={chartData} />
+      <div className="pagination">
+        <button disabled={page===1} onClick={()=>setPage(page-1)}>Prev</button>
+        <span>Page {page}</span>
+        <button disabled={page*5 >= total} onClick={()=>setPage(page+1)}>Next</button>
       </div>
     </div>
   );

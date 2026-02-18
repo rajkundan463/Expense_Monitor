@@ -1,7 +1,8 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
+import cors from "cors";
 import mongoose from "mongoose";
+
 import authRoutes from "./routes/auth.routes.js";
 import expenseRoutes from "./routes/expense.routes.js";
 import errorHandler from "./middlewares/error.middleware.js";
@@ -20,6 +21,8 @@ app.use(errorHandler);
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
-    app.listen(5000, () => console.log("Server running on port 5000"));
+    app.listen(process.env.PORT || 5000, () =>
+      console.log("Server running")
+    );
   })
   .catch(err => console.error(err));

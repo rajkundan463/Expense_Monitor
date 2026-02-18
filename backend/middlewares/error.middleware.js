@@ -1,4 +1,7 @@
 export default (err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ message: "Internal Server Error" });
+  if (err.errors) {
+    return res.status(400).json({ message: err.errors });
+  }
+  res.status(500).json({ message: "Server Error" });
 };
