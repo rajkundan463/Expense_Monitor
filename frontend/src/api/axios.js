@@ -1,29 +1,40 @@
 import axios from "axios";
 
-const instance = axios.create({
+const api = axios.create({
   baseURL: "http://localhost:5000/api"
 });
 
-instance.interceptors.request.use((config) => {
+api.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-instance.interceptors.response.use(
+api.interceptors.response.use(
   res => res,
-  async error => {
-    if (error.response?.status === 401) {
+  async err => {
+    if (err.response?.status === 401) {
       const refreshToken = localStorage.getItem("refreshToken");
-      if (refreshToken) {
-        const response = await axios.post("http://localhost:5000/api/auth/refresh", { refreshToken });
-        localStorage.setItem("accessToken", response.data.accessToken);
-        error.config.headers.Authorization = `Bearer ${response.data.accessToken}`;
-        return axios(error.config);
+      if (!refreshToken) return Promise.reject(err);
+
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/auth/refresh",
+          { refreshToken }
+        );
+
+        localStorage.setItem("accessToken", res.data.accessToken);
+        err.config.headers.Authorization =
+          `Bearer ${res.data.accessToken}`;
+
+        return api(err.config);
+      } catch {
+        localStorage.clear();
+        window.location.href = "/login";
       }
     }
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
 
-export default instance;
+export default api;

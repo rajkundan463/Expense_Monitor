@@ -1,49 +1,113 @@
-body {
-  font-family: Inter, sans-serif;
+body{
+  margin:0;
+  font-family:Inter,sans-serif;
   background:#0f172a;
   color:white;
-  margin:0;
-  padding:20px;
 }
 
-.auth-container {
+.auth-wrapper{
   display:flex;
   height:100vh;
-  justify-content:center;
-  align-items:center;
 }
 
-.auth-card {
-  background:#1f2937;
-  padding:40px;
-  border-radius:12px;
-}
-
-input,select,button {
-  padding:8px;
-  margin:5px 0;
-}
-
-.dashboard header {
+.auth-left{
+  flex:1;
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
   display:flex;
-  justify-content:space-between;
-  align-items:center;
+  flex-direction:column;
+  justify-content:center;
+  padding:60px;
 }
 
-table {
+.auth-card{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:60px;
+}
+
+input,select{
+  padding:12px;
+  border:none;
+  border-radius:8px;
+}
+
+.primary-btn{
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#3b82f6;
+  color:white;
+  cursor:pointer;
+}
+
+.dashboard-layout{
+  display:flex;
+  min-height:100vh;
+}
+
+.sidebar{
+  width:240px;
+  background:#111827;
+  padding:30px;
+}
+
+.main-content{
+  flex:1;
+  padding:40px;
+}
+
+.card,.kpi-card,.table-card{
+  background:#1f2937;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
+}
+
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  margin-bottom:20px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;
+}
+
+table{
   width:100%;
   border-collapse:collapse;
-  margin-top:20px;
 }
 
-th,td {
+th,td{
   padding:10px;
-  border-bottom:1px solid #334155;
 }
 
-.pagination {
-  margin-top:20px;
+.danger-btn{
+  background:#ef4444;
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+  color:white;
+  cursor:pointer;
+}
+
+.pagination{
   display:flex;
-  gap:10px;
+  gap:15px;
   align-items:center;
+  margin-top:20px;
+}
+
+.error{
+  color:#f87171;
+}
+
+.toggle{
+  cursor:pointer;
+  margin-top:10px;
 }
