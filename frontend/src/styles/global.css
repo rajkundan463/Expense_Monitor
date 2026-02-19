@@ -1,0 +1,33 @@
+
+body{
+  margin:0;
+  font-family:Inter,sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
+}
+.glass{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.card{margin-bottom:20px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.row{display:flex;justify-content:space-between;margin:10px 0;}
+.warn{color:orange;}
+.alert{color:red;}
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  background:#00c6ff;
+  cursor:pointer;
+}
+input{
+  padding:8px;
+  border-radius:8px;
+  border:none;
+  margin:5px 0;
+}

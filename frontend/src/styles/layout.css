@@ -1,0 +1,12 @@
+
+.app{display:flex;height:100vh;}
+.sidebar{
+  width:240px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:20px;
+}
+.logo{font-size:22px;font-weight:bold;}
+.main{flex:1;padding:30px;overflow:auto;}
+a{color:white;text-decoration:none;}

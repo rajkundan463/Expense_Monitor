@@ -1,7 +1,8 @@
+
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://expense-monitor-81wd.onrender.com/api"
+  baseURL: "http://localhost:5000/api"
 });
 
 api.interceptors.request.use((config) => {
@@ -12,28 +13,17 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   res => res,
-  async err => {
-    if (err.response?.status === 401) {
+  async error => {
+    if (error.response?.status === 401) {
       const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) return Promise.reject(err);
-
-      try {
-        const res = await axios.post(
-          "http://localhost:5000/api/auth/refresh",
-          { refreshToken }
-        );
-
+      if (refreshToken) {
+        const res = await axios.post("http://localhost:5000/api/auth/refresh",{refreshToken});
         localStorage.setItem("accessToken", res.data.accessToken);
-        err.config.headers.Authorization =
-          `Bearer ${res.data.accessToken}`;
-
-        return api(err.config);
-      } catch {
-        localStorage.clear();
-        window.location.href = "/login";
+        error.config.headers.Authorization = `Bearer ${res.data.accessToken}`;
+        return axios(error.config);
       }
     }
-    return Promise.reject(err);
+    return Promise.reject(error);
   }
 );
 

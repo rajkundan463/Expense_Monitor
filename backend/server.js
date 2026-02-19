@@ -13,10 +13,13 @@ import adminRoutes from "./routes/admin.routes.js";
 import {errorHandler} from "./middlewares/error.middleware.js";
 
 const app=express();
-app.use(cors());
+app.use(cors({
+  origin: "https://expense-monitor-ycd2.vercel.app/",
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(cookieParser());
-
 connectDB();
 
 app.use("/api/auth",authRoutes);
