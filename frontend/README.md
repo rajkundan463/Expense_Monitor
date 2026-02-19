@@ -1,25 +1,78 @@
 
-# 💎 Finance SaaS Enterprise Frontend
+# 🎨 Expense Management Frontend
 
-## Run
+## 🛠 Tech Stack
+- React (Vite)
+- React Router
+- Axios
+- Context API
+- Chart.js
+- Modern Dark SaaS UI
 
-npm install
-npm run dev
+---
 
-Backend must run at:
-http://localhost:5000
+## 🔐 Authentication
+- Register
+- Login
+- Access Token Handling
+- Refresh Token Auto Handling
+- Logout
+- Protected Routes
+- Role-based UI rendering
 
-## Features
+---
 
-✔ JWT Auth with refresh rotation
-✔ Role-based routing
-✔ Admin dashboard
-✔ Expense CRUD
-✔ Income CRUD
-✔ Budget alert system
-✔ Chart.js analytics
-✔ Glassmorphism premium UI
-✔ Responsive grid layout
-✔ Enterprise folder structure
+## 💰 Core Features
+- Add Expense (Idempotent Safe)
+- Edit Expense
+- Delete Expense
+- Pagination
+- Category Filter
+- Sort by Date
+- Total Spending KPI
+- Income Tracking
+- Monthly Analytics
+- Budget Alerts (80% Warning / 100% Alert)
+- Category Pie Chart
+- Loading States
+- Error Handling
+- Empty State UI
 
-Fully production ready.
+---
+
+## 🎨 UI Layout
+
+Sidebar:
+- Logo
+- Dashboard
+- Analytics
+- Budget
+- Admin (Role Based)
+- Logout
+
+Main Content:
+- KPI Cards
+- Expense Form
+- Income Form
+- Filters
+- Data Table
+- Charts
+- Pagination
+
+---
+
+## ▶️ Run Locally
+
+npm install  
+npm run dev  
+
+---
+
+## 🌍 Deployment
+Recommended:
+- Vercel (Frontend Hosting)
+- Backend API connected via environment baseURL
+
+---
+
+Production-ready, scalable SaaS-level dashboard.

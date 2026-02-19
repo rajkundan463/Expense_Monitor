@@ -40,7 +40,7 @@ api.interceptors.response.use(
         } catch (err) {
           console.error("Failed to refresh token:", err);
           localStorage.clear();
-          window.location.href = "/auth";
+          window.location.href = "/login";
         }
       }
     }
