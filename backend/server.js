@@ -14,7 +14,7 @@ import {errorHandler} from "./middlewares/error.middleware.js";
 
 const app=express();
 app.use(cors({
-  origin: "https://expense-monitor-ycd2.vercel.app/",
+  origin: "https://expensemonitor-ochre.vercel.app/auth/",
   credentials: true
 }));
 
