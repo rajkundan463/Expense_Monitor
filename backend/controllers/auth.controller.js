@@ -1,59 +1,44 @@
+
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import { registerSchema } from "../validators/auth.validator.js";
+import RefreshToken from "../models/RefreshToken.js";
+import { generateAccessToken,generateRefreshToken } from "../services/token.service.js";
 
-export const register = async (req, res, next) => {
-  try {
-    registerSchema.parse(req.body);
-
-    const { email, password } = req.body;
-    const hashed = await bcrypt.hash(password, 10);
-
-    const user = await User.create({ email, password: hashed });
-
-    res.status(201).json({ message: "User registered" });
-  } catch (err) {
-    next(err);
-  }
+export const register = async(req,res)=>{
+  const {name,email,password}=req.body;
+  const hash=await bcrypt.hash(password,10);
+  await User.create({name,email,password:hash});
+  res.json({message:"Registered"});
 };
 
-export const login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
+export const login = async(req,res)=>{
+  const {email,password}=req.body;
+  const user=await User.findOne({email});
+  if(!user) return res.status(400).json({message:"Invalid"});
+  const ok=await bcrypt.compare(password,user.password);
+  if(!ok) return res.status(400).json({message:"Invalid"});
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+  const access=generateAccessToken(user);
+  const refresh=generateRefreshToken(user);
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ message: "Invalid credentials" });
+  await RefreshToken.create({
+    user:user._id,
+    token:refresh,
+    expiresAt:new Date(Date.now()+7*24*60*60*1000)
+  });
 
-    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15m" });
-    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
-
-    user.refreshToken = refreshToken;
-    await user.save();
-
-    res.json({ accessToken, refreshToken });
-  } catch (err) {
-    next(err);
-  }
+  res.json({accessToken:access,refreshToken:refresh,role:user.role});
 };
 
-export const refresh = async (req, res, next) => {
-  try {
-    const { refreshToken } = req.body;
-    if (!refreshToken) return res.status(401).json({ message: "No token" });
+export const refreshToken = async(req,res)=>{
+  const {refreshToken}=req.body;
+  const stored=await RefreshToken.findOne({token:refreshToken});
+  if(!stored) return res.status(403).json({message:"Invalid"});
+  const access=generateAccessToken({ _id:stored.user, role:"user"});
+  res.json({accessToken:access});
+};
 
-    const user = await User.findOne({ refreshToken });
-    if (!user) return res.status(403).json({ message: "Invalid token" });
-
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-    const newAccess = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15m" });
-
-    res.json({ accessToken: newAccess });
-  } catch (err) {
-    next(err);
-  }
+export const logout = async(req,res)=>{
+  await RefreshToken.deleteMany({user:req.user.id});
+  res.json({message:"Logged out"});
 };

@@ -1,13 +1,15 @@
+
 import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
 
-export default (req, res, next) => {
+export const protect = (req,res,next)=>{
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
-
-  try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+  if(!token) return res.status(401).json({message:"Unauthorized"});
+  try{
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET);
+    req.user = decoded;
     next();
-  } catch {
-    res.status(401).json({ message: "Invalid token" });
+  }catch{
+    res.status(401).json({message:"Token Expired"});
   }
 };

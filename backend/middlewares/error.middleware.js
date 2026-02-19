@@ -1,7 +1,8 @@
-export default (err, req, res, next) => {
+
+export const errorHandler = (err, req, res, next) => {
   console.error(err);
-  if (err.errors) {
-    return res.status(400).json({ message: err.errors });
-  }
-  res.status(500).json({ message: "Server Error" });
+  res.status(err.status || 500).json({
+    success:false,
+    message: err.message || "Server Error"
+  });
 };

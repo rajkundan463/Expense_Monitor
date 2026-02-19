@@ -1,32 +1,30 @@
+
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
-import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
+import {connectDB} from "./config/db.js";
+import {env} from "./config/env.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import expenseRoutes from "./routes/expense.routes.js";
-import errorHandler from "./middlewares/error.middleware.js";
+import incomeRoutes from "./routes/income.routes.js";
+import budgetRoutes from "./routes/budget.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import {errorHandler} from "./middlewares/error.middleware.js";
 
-dotenv.config();
-
-const app = express();
-app.use(cors({
-  origin: "https://expense-monitor-ycd2.vercel.app/",
-  credentials: true
-}));
-
+const app=express();
+app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
-app.use("/api/auth", authRoutes);
-app.use("/api/expenses", expenseRoutes);
+connectDB();
+
+app.use("/api/auth",authRoutes);
+app.use("/api/expenses",expenseRoutes);
+app.use("/api/income",incomeRoutes);
+app.use("/api/budget",budgetRoutes);
+app.use("/api/admin",adminRoutes);
 
 app.use(errorHandler);
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB Connected");
-    app.listen(process.env.PORT || 5000, () =>
-      console.log("Server running")
-    );
-  })
-  .catch(err => console.error(err));
+app.listen(env.PORT,()=>console.log("Server running"));

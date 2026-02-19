@@ -1,83 +1,38 @@
+
 import Expense from "../models/Expense.js";
-import mongoose from "mongoose";
-import { expenseSchema } from "../validators/expense.validator.js";
 
-export const createExpense = async (req, res, next) => {
-  try {
-    expenseSchema.parse(req.body);
+export const createExpense = async(req,res)=>{
+  const {amount,category,description,idempotencyKey}=req.body;
+  const existing=await Expense.findOne({idempotencyKey});
+  if(existing) return res.json(existing);
 
-    const key = req.headers["idempotency-key"];
-    if (key) {
-      const existing = await Expense.findOne({ idempotencyKey: key });
-      if (existing) return res.json(existing);
-    }
-
-    const expense = await Expense.create({
-      ...req.body,
-      userId: req.user.id,
-      idempotencyKey: key
-    });
-
-    res.status(201).json(expense);
-  } catch (err) {
-    next(err);
-  }
+  const exp=await Expense.create({
+    user:req.user.id,amount,category,description,idempotencyKey
+  });
+  res.json(exp);
 };
 
-export const getExpenses = async (req, res, next) => {
-  try {
-    const { category, sort, page = 1, limit = 10 } = req.query;
+export const getExpenses = async(req,res)=>{
+  const {page=1,limit=10,category,sort}=req.query;
+  const q={user:req.user.id};
+  if(category) q.category=category;
 
-    const query = { userId: req.user.id };
-    if (category) query.category = category;
+  const data=await Expense.find(q)
+   .sort(sort==="date_asc"?{date:1}:{date:-1})
+   .skip((page-1)*limit)
+   .limit(Number(limit));
 
-    const expenses = await Expense.find(query)
-      .sort({ date: sort === "date_asc" ? 1 : -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
+  const total=await Expense.countDocuments(q);
 
-    const total = await Expense.countDocuments(query);
+  const sum=await Expense.aggregate([
+    {$match:q},
+    {$group:{_id:null,total:{$sum:"$amount"}}}
+  ]);
 
-    res.json({ expenses, total });
-  } catch (err) {
-    next(err);
-  }
+  res.json({data,total,totalSpending:sum[0]?.total||0});
 };
 
-export const deleteExpense = async (req, res, next) => {
-  try {
-    await Expense.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
-    res.json({ message: "Deleted" });
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const updateExpense = async (req, res, next) => {
-  try {
-    expenseSchema.parse(req.body);
-
-    const updated = await Expense.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
-      req.body,
-      { new: true }
-    );
-
-    res.json(updated);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const summary = async (req, res, next) => {
-  try {
-    const data = await Expense.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(req.user.id) } },
-      { $group: { _id: "$category", total: { $sum: "$amount" } } }
-    ]);
-
-    res.json(data);
-  } catch (err) {
-    next(err);
-  }
+export const deleteExpense = async(req,res)=>{
+  await Expense.findByIdAndDelete(req.params.id);
+  res.json({message:"Deleted"});
 };
