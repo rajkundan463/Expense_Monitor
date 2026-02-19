@@ -17,8 +17,9 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:5173", 
-      "https://expensemonitor-ochre.vercel.app" 
+      "http://localhost:5173",
+      "https://expensemonitor-ochre.vercel.app",
+      "https://expense-monitor-ycd2.vercel.app"
     ],
     credentials: true
   })
